@@ -3,6 +3,8 @@
 
 // Settings
 
+// Strange Chromeness -- can't connect to self.
+
 var modes = ["work", "break"]
 
 var defaultTime = {
@@ -21,7 +23,15 @@ var defaultTime = {
 
     export : function(time) {
         return time.toString()
-    }
+    },
+
+    open : function(key) {
+        return this.export(this.get(key))
+    },
+
+    save : function(key, text) {
+        this.set(key, this.import(text))
+    },
 }
 
 // Blacklist
@@ -47,6 +57,10 @@ var blacklist = {
 
     // high-level routines
 
+    open : function() {
+        return this.export(this.get())
+    },
+    
     save : function(text) {
         this.set(this.import(text))
     },
@@ -54,25 +68,16 @@ var blacklist = {
     isBlocked : function(url) {
         url = url.toLowerCase()
         return _.any(this.get(), function(item) {
-            url.search(item.toLowerCase()) != -1
+            return url.search(item.toLowerCase()) != -1
         })
     }
 }
 
 var mode = {
-    change : function (request) {
-        chrome.extension.sendRequest(request, function(response) {})
+    change : function (msg) {
+        chrome.extension.getBackgroundPage().currentState = msg
+        chrome.extension.getBackgroundPage().change()
     },
-
-    listen : function (f) {
-        chrome.extension.onRequest.addListener(function (request, sender, sendResponse) {
-            if (request.mode) {
-                f(request)
-            }
-            sendResponse({})
-        })
-    },
-
     // High-level commands
 
     pause : function () {

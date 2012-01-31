@@ -8,8 +8,7 @@
     {
       "matches": ["*://*/*"],
       "css": ["overlay.css"],
-      "js": ["jquery.js", "cache.js", "underscore.js", "overlay.js"],
-      "run_at": "document_start"
+      "js": ["jquery.js", "underscore.js"]
     }
    ],
    "description": "Here's a description.",

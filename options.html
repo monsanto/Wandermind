@@ -3,44 +3,50 @@
     <title>Wandering Mind Options</title>
     <script src="jquery.js"></script>
     <script src="cache.js"></script>
+    <script src="underscore.js"></script>
     <script src="wandermind.js"></script>
     <script>
       $(document).ready(function() {
-        $("#blacklist").val(blacklist.export(blacklist.get()))
-        whitelist = cache.getItem("whitelist")
-        var text = ""
-        for (var i in whitelist) {
-          text += "*" + i + "\n"
-          text += whitelist[i].join("\n") + "\n"
-       } 
-        $("#domain-whitelist").val(text)
+        $("#blacklist").val(blacklist.open())
 
-        _.each(modes, function(mode) {
-          $("#" + mode + "-default").val(defaultTime.get(mode))
+      _.each(modes, function(mode) {
+          console.log(mode)
+          $("#" + mode + "-default").val(defaultTime.open(mode))
         })
-      
-        $("#save").click(function(e) {
-          blacklist.set(blacklist.import($("#blacklist").val()))
-          stuffs = $("#domain-whitelist").val().split("\n")
-          var whitelist = {}
-          var last = []
-          for (var i in stuffs) {
-           if (stuffs[i][0] == "*") {
-            last = stuffs[i].substr(1).split(",")
-            for (var j in last) {
-              whitelist[last[j]] = []
-            }
-           } else if(stuffs[i]) {
-            for (var j in last) {
-              whitelist[last[j]].push(stuffs[i])
-            }
-           } 
-          }
-          cache.setItem("whitelist", whitelist)
 
-          _.each(modes, function(mode) {
-            defaultTime.set(mode, defaultTime.export($("#" + mode + "-default").val()))
+       <!--  whitelist = cache.getItem("whitelist") -->
+       <!--  var text = "" -->
+       <!--  for (var i in whitelist) { -->
+       <!--    text += "*" + i + "\n" -->
+       <!--    text += whitelist[i].join("\n") + "\n" -->
+       <!-- }  -->
+       <!--  $("#domain-whitelist").val(text) -->
+
+        
+        $("#save").click(function(e) {
+          blacklist.save($("#blacklist").val())
+           _.each(modes, function(mode) {
+            defaultTime.save(mode, $("#" + mode + "-default").val())
           })
+       
+          <!-- stuffs = $("#domain-whitelist").val().split("\n") -->
+          <!-- var whitelist = {} -->
+          <!-- var last = [] -->
+          <!-- for (var i in stuffs) { -->
+          <!--  if (stuffs[i][0] == "*") { -->
+          <!--   last = stuffs[i].substr(1).split(",") -->
+          <!--   for (var j in last) { -->
+          <!--     whitelist[last[j]] = [] -->
+          <!--   } -->
+          <!--  } else if(stuffs[i]) { -->
+          <!--   for (var j in last) { -->
+          <!--     whitelist[last[j]].push(stuffs[i]) -->
+          <!--   } -->
+          <!--  }  -->
+          <!-- } -->
+          <!-- cache.setItem("whitelist", whitelist) -->
+
+         
         })
       })
     </script>
@@ -51,12 +57,12 @@
         <textarea rows="15" cols="30" id="blacklist"></textarea><br><br>
         White list:<br>
         <textarea rows="15" cols="30" id="domain-whitelist"></textarea><br><br>
-        <label for="work-duration">Work:</label>
-        <input id="work-duration" type="text" size="2" />
+        <label for="work-default">Work:</label>
+        <input id="work-default" type="text" size="2" />
         <span>minutes</span>
         &nbsp;&nbsp;
-        <label for="break-duration">Break:</label>
-        <input id="break-duration" type="text" size="2" />
+        <label for="break-default">Break:</label>
+        <input id="break-default" type="text" size="2" />
         <span>minutes</span><br><br>
       <button id="save">Save</button>
   </body>

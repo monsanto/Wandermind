@@ -3,29 +3,45 @@
 <script src="cache.js"></script>
 <script src="underscore.js"></script>
 <script src="wandermind.js"></script>
-
 <script>
 /* blocking */
 
 var colors = {"work": [192, 0, 0, 255], "break": [0, 192, 0, 255]}
 var finishedSound = new Audio("ring.mp3");
 
-var interval
+function block(tab) {
+    if (currentState.mode != "break" && blacklist.isBlocked(tab.url)) {
+        chrome.tabs.executeScript(tab.id, {file: "overlay.js"})
+    }
+}
+
+function blockAll() {
+    chrome.windows.getAll({populate:true}, function (windows) {
+        _.each(windows, function (window) {
+            _.each(window.tabs, function (tab) {
+                block(tab)
+            })
+        })
+    })
+}
+
+    var currentState, interval
 
 /* Modes: pause, work, break */
 
-function change(request) {
-    if (request.mode == "pause") {
+function change() {
+    if (currentState.mode == "pause") {
+        blockAll()
         clearInterval(interval) // just in case
         chrome.browserAction.setBadgeText({text: ''})
         chrome.browserAction.setIcon({path: "icons/pause.png"})
         chrome.browserAction.setPopup({popup: "popup.html"})
     } else {
-        var timeRemaining = request.duration * 60
+        var timeRemaining = currentState.duration * 60
 
-        chrome.browserAction.setBadgeBackgroundColor({color: colors[request.mode]})
+        chrome.browserAction.setBadgeBackgroundColor({color: colors[currentState.mode]})
         chrome.browserAction.setBadgeText({text: formatDuration(timeRemaining)})
-        chrome.browserAction.setIcon({path: "icons/" + request.mode + ".png"})
+        chrome.browserAction.setIcon({path: "icons/" + currentState.mode + ".png"})
         chrome.browserAction.setPopup({popup: "popup_cancel.html"})
 
         function tick() {
@@ -35,7 +51,7 @@ function change(request) {
 
             if (timeRemaining <= 0) {
                 notification = webkitNotifications.createNotification(
-                    "icons/" + request.mode + ".png",
+                    "icons/" + currentState.mode + ".png",
                     "Time's up!",
                     "Bring more work on!"
                 )
@@ -43,7 +59,7 @@ function change(request) {
                 finishedSound.play()
 
                 cachetags = cache.getItem("tags", {})
-                _.each(tags, function (tag) {
+                _.each(currentState.tags, function (tag) {
                     if (!tag) 
                         cachetags[tag] = 0
                     else
@@ -60,7 +76,11 @@ function change(request) {
     }
 }
 
-mode.listen(change)
+chrome.tabs.onUpdated.addListener(function (tabId, changeInfo, tab) {
+    block(tab)
+})
+
+mode.change({mode: "pause"}) // init
 
 </script>
 </html>
