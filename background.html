@@ -4,13 +4,16 @@
 <script src="underscore.js"></script>
 <script src="wandermind.js"></script>
 <script>
-/* blocking */
 
 var colors = {"work": [192, 0, 0, 255], "break": [0, 192, 0, 255]}
 var finishedSound = new Audio("ring.mp3");
 
+/* blocking */
+
 function block(tab) {
-    if (currentState.mode != "break" && blacklist.isBlocked(tab.url)) {
+    if (currentState.mode != "break" &&
+        blacklist.isBlocked(tab.url) &&
+        !_.any(currentState.tags, function(tag) { return whitelist.isAllowed(tag, tab.url) }) ) {
         chrome.tabs.executeScript(tab.id, {file: "overlay.js"})
     }
 }
@@ -25,9 +28,9 @@ function blockAll() {
     })
 }
 
-    var currentState, interval
-
 /* Modes: pause, work, break */
+
+var currentState, interval
 
 function change() {
     if (currentState.mode == "pause") {
@@ -58,14 +61,9 @@ function change() {
                 notification.show()
                 finishedSound.play()
 
-                cachetags = cache.getItem("tags", {})
                 _.each(currentState.tags, function (tag) {
-                    if (!tag) 
-                        cachetags[tag] = 0
-                    else
-                        cachetags[tag] += 1
+                    tagCounter.increment(tag)
                 })
-                cache.setItem("tags", cachetags)
 
                 mode.pause()
             }
@@ -80,7 +78,7 @@ chrome.tabs.onUpdated.addListener(function (tabId, changeInfo, tab) {
     block(tab)
 })
 
-mode.change({mode: "pause"}) // init
+mode.pause()
 
 </script>
 </html>

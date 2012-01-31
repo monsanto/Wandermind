@@ -9,44 +9,22 @@
       $(document).ready(function() {
         $("#blacklist").val(blacklist.open())
 
-      _.each(modes, function(mode) {
-          console.log(mode)
+        _.each(modes, function(mode) {
           $("#" + mode + "-default").val(defaultTime.open(mode))
         })
 
-       <!--  whitelist = cache.getItem("whitelist") -->
-       <!--  var text = "" -->
-       <!--  for (var i in whitelist) { -->
-       <!--    text += "*" + i + "\n" -->
-       <!--    text += whitelist[i].join("\n") + "\n" -->
-       <!-- }  -->
-       <!--  $("#domain-whitelist").val(text) -->
+        $("#whitelist").val(whitelist.open())
 
-        
         $("#save").click(function(e) {
           blacklist.save($("#blacklist").val())
-           _.each(modes, function(mode) {
+
+          _.each(modes, function(mode) {
             defaultTime.save(mode, $("#" + mode + "-default").val())
           })
-       
-          <!-- stuffs = $("#domain-whitelist").val().split("\n") -->
-          <!-- var whitelist = {} -->
-          <!-- var last = [] -->
-          <!-- for (var i in stuffs) { -->
-          <!--  if (stuffs[i][0] == "*") { -->
-          <!--   last = stuffs[i].substr(1).split(",") -->
-          <!--   for (var j in last) { -->
-          <!--     whitelist[last[j]] = [] -->
-          <!--   } -->
-          <!--  } else if(stuffs[i]) { -->
-          <!--   for (var j in last) { -->
-          <!--     whitelist[last[j]].push(stuffs[i]) -->
-          <!--   } -->
-          <!--  }  -->
-          <!-- } -->
-          <!-- cache.setItem("whitelist", whitelist) -->
 
-         
+          whitelist.save($("#whitelist").val())
+          
+          cache.setItem("whitelist", whitelist)
         })
       })
     </script>
@@ -56,7 +34,7 @@
     Ban list:<br>
         <textarea rows="15" cols="30" id="blacklist"></textarea><br><br>
         White list:<br>
-        <textarea rows="15" cols="30" id="domain-whitelist"></textarea><br><br>
+        <textarea rows="15" cols="30" id="whitelist"></textarea><br><br>
         <label for="work-default">Work:</label>
         <input id="work-default" type="text" size="2" />
         <span>minutes</span>

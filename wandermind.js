@@ -73,6 +73,94 @@ var blacklist = {
     }
 }
 
+// Tags
+
+var tagCounter = {
+    set : function (tag, value) {
+        cache.setItem("tag-" + tag, value)
+    },
+
+    get : function (tag) {
+        return cache.getItem("tag-" + tag, 0)
+    },
+
+     import : function(text) {
+        return parseInt(text)
+    },
+
+    export : function(value) {
+        return value.toString()
+    },
+
+    open : function(key) {
+        return this.export(this.get(key))
+    },
+
+    save : function(key, text) {
+        this.set(key, this.import(text))
+    },
+
+    increment : function(key) {
+        this.set(key, this.get(key) + 1)
+    }
+}
+
+// Whitelists
+
+var whitelist = {
+    set : function (wl) {
+        cache.setItem("whitelist", wl)
+    },
+
+    get : function () {
+        return cache.getItem("whitelist", {})
+    },
+
+    import : function(text) {
+        items = text.split("\n")
+        var currentItem = null
+        var whitelist = {}
+        _.each(items, function(item) {
+            if (item[0] == "*") {
+                currentItem = item.substr(1)
+            } else {
+                whitelist[item].push()
+            }
+        })
+        return whitelist
+    },
+
+    export : function(wl) {
+        var text = ""
+        _.each(wl, function(value, key) {
+            text += "*" + key + "\n"
+            text += value.join("\n") + "\n"
+        })
+        return text
+    },
+
+    open : function(key) {
+        return this.export(this.get(key))
+    },
+
+    save : function(text) {
+        this.set(this.import(text))
+    },
+
+    getTag : function(tag) {
+        return this.get()[tag]
+    },
+
+    isAllowed : function(tag, url) {
+        url = url.toLowerCase()
+        return _.any(this.getTag(tag), function(item) {
+            return url.search(item.toLowerCase()) != -1
+        })
+    }
+}
+
+// Modes
+
 var mode = {
     change : function (msg) {
         chrome.extension.getBackgroundPage().currentState = msg
@@ -81,7 +169,7 @@ var mode = {
     // High-level commands
 
     pause : function () {
-        this.change({mode: "pause"})
+        this.change({mode: "pause", tags: [], duration: 0})
     },
 
     work : function(tags, duration) {
@@ -89,7 +177,7 @@ var mode = {
     },
 
     break : function(duration) {
-        this.change({mode: "break", duration: duration})
+        this.change({mode: "break", tags: [], duration: duration})
     }
 }
 
