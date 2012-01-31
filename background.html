@@ -1,6 +1,8 @@
 <html>
 <script src="settings.js"></script>
 <script src="cache.js"></script>
+    <script src="jquery.js"></script>
+
 <script>
 /* init */
 
@@ -13,9 +15,19 @@ cache.setDefault("times", {"work": 25 * 60, "break": 5 * 60})
 function block(tab) {
     var url = "chrome-extension://dkldajbpiihamkjkbhlegmfdbdplhiok/no.html"
     var badUrls = cache.getItem("blacklist")
+    var whitelist = cache.getItem("whitelist")
+
     if (mode != "break") {
         for (var i in badUrls) {
-            if (tab.url.search(badUrls[i]) != -1) {
+            if (tab.url.toLowerCase().search(badUrls[i].toLowerCase()) != -1) {
+                for (var j in whitelist) {
+                    if ($.inArray(j, tags) != -1) {
+                        for (var k in whitelist[j]) {
+                            if (tab.url.toLowerCase().search(whitelist[j][k].toLowerCase()) != -1)
+                                return
+                        }
+                    }
+                }
                 chrome.tabs.update(tab.id, {url: url})
                 return
             }

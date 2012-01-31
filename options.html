@@ -10,7 +10,7 @@
         var text = ""
         for (var i in whitelist) {
           text += "*" + i + "\n"
-          text += whitelist[i].join("\n")
+          text += whitelist[i].join("\n") + "\n"
         }
         $("#domain-whitelist").val(text)
         $("#work-duration").val(cache.getItem("times")["work"])
@@ -27,7 +27,7 @@
             for (var j in last) {
               whitelist[last[j]] = []
             }
-           } else {
+           } else if(stuffs[i]) {
             for (var j in last) {
               whitelist[last[j]].push(stuffs[i])
             }
