@@ -13,7 +13,7 @@ mode.listen(function(request) {
     if (request.mode == "break") {
         disableBlock()
     } else {
-        if (blacklist.isBlocked()) {
+        if (blacklist.isBlocked(location.href)) {
             enableBlock()
         } else {
             disableBlock()

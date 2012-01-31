@@ -1,7 +1,5 @@
 
-// Load jquery, cache, and underscore
-
-
+// *** Load jquery, cache, and underscore first! *** //
 
 // Settings
 
@@ -53,8 +51,8 @@ var blacklist = {
         this.set(this.import(text))
     },
 
-    isBlocked : function(tab) {
-        url = tab.url.toLowerCase()
+    isBlocked : function(url) {
+        url = url.toLowerCase()
         return _.any(this.get(), function(item) {
             url.search(item.toLowerCase()) != -1
         })
