@@ -1,4 +1,5 @@
-/* from http://www.bennadel.com/blog/2105-Exploring-HTML5-s-localStorage-Persistent-Client-Side-Key-Value-Pairs.htm */
+/* from
+   http://www.bennadel.com/blog/2105-Exploring-HTML5-s-localStorage-Persistent-Client-Side-Key-Value-Pairs.htm */
 
 function Cache( nativeStorage, serializer ){
  

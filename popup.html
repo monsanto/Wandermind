@@ -12,6 +12,8 @@
     </style>
     <script src="jquery.js"></script>
     <script src="cache.js"></script>
+    <script src="underscore.js"></script>
+    <script src="wandermind.js"></script>
     <script>
       $(document).ready(function() {
         $("#selWork").click(function(e) {
@@ -29,18 +31,18 @@
       })
       
         $("#go").click(function(e) {
-          var mode = $("[name=mode]:checked").val()
+          var newMode = $("[name=mode]:checked").val()
           var tags = $("#tags").val().split(" ")
 
-          var time
+          var duration
 
           if ($("#customTime:checked").val() == "1") {
-            time = parseInt($("#time").val())
+            duration = parseInt($("#time").val())
           } else {
-            time = cache.getItem("times")[mode]
+            duration = defaultTime.get(newMode) 
           }
 
-          chrome.extension.sendRequest({mode: mode, tags: tags, time: time}, function(response) { })
+          mode.change({mode: newMode, tags: tags, duration: duration})
 
           window.location="letsdothis.html" ;
         })

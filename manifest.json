@@ -4,6 +4,14 @@
       "default_icon": "icons/pause.png",
       "popup":"popup.html"
    },
+   "content_scripts": [
+    {
+      "matches": ["*://*/*"],
+      "css": ["overlay.css"],
+      "js": ["jquery.js", "cache.js", "underscore.js", "overlay.js"],
+      "run_at": "document_start"
+    }
+   ],
    "description": "Here's a description.",
    "icons": {
       "128": "icons/icon128.png",
@@ -13,5 +21,6 @@
    "name": "Wandering Mind",
    "options_page": "options.html",
    "permissions": [ "notifications", "tabs", "*://*/*" ],
-   "version": "0.1"
+   "version": "0.1",
+   "homepage_url": "https://github.com/monsanto/Wandermind"
 }
