@@ -1,0 +1,124 @@
+<html>
+<script src="settings.js"></script>
+<script src="cache.js"></script>
+<script>
+/* init */
+
+cache.setDefault("blacklist", [])
+cache.setDefault("whitelist", {})
+cache.setDefault("times", {"work": 25 * 60, "break": 5 * 60})
+
+/* blocking */
+
+function block(tab) {
+    var url = "chrome-extension://dkldajbpiihamkjkbhlegmfdbdplhiok/no.html"
+    var badUrls = cache.getItem("blacklist")
+    if (mode != "break") {
+        for (var i in badUrls) {
+            if (tab.url.search(badUrls[i]) != -1) {
+                chrome.tabs.update(tab.id, {url: url})
+                return
+            }
+        }
+    }
+}
+
+function blockAll() {
+    chrome.windows.getAll({populate: true}, function (windows) {
+        for(var i in windows) {
+            var tabs = windows[i].tabs;
+            for(var j in tabs) {
+                block(tabs[j])
+            }
+        }
+    });
+}
+
+/* Timer */
+/* A timer object has the following methods: timeRemaining, onStart, onEnd, onTick
+*/
+
+var mode, tags, time, interval
+
+
+function formatRemaining (timeRemaining) {
+    if(timeRemaining >= 60) {
+        return Math.round(timeRemaining / 60) + "m";
+    } else {
+        return (timeRemaining % 60) + "s";
+    }
+}
+
+
+/* Modes: pause, work, break */
+
+function change() {
+    if (mode == "pause") {
+        blockAll() // break's over!
+        clearInterval(interval) // just in case
+        chrome.browserAction.setIcon({path: "icons/pause.png"})
+        chrome.browserAction.setPopup({popup: "popup.html"})
+        chrome.browserAction.setBadgeText({text: ''})
+    } else {
+        chrome.browserAction.setBadgeBackgroundColor({color: colors[mode]})
+        chrome.browserAction.setIcon({path: "icons/" + mode + ".png"})
+        chrome.browserAction.setPopup({popup: "popup_cancel.html"})
+
+        var timeRemaining = time * 60
+        
+        function tick() {
+            timeRemaining--
+            
+            chrome.browserAction.setBadgeText({text: formatRemaining(timeRemaining)})
+
+            if (timeRemaining <= 0) {
+                notification = webkitNotifications.createNotification(
+                    "icons/" + mode + ".png",
+                    "Time's up!",
+                    "Bring more work on!"
+                )
+                notification.show()
+                finishedSound.play()
+
+                cachetags = cache.getItem("tags", {})
+                for (var i in tags) {
+                  if (!tags[i]) 
+                    cachetags[tags[i]] = 0
+                  else
+                    cachetags[tags[i]] += 1
+                }
+                cache.setItem("tags", cachetags)
+                    
+                mode = "pause"
+                change()
+            }
+        }
+
+        chrome.browserAction.setBadgeText({text: formatRemaining(timeRemaining)})
+        interval = window.setInterval(tick, 1000)
+        return interval
+    }
+}
+
+/* Popup pressed enter */
+chrome.extension.onRequest.addListener(function (request, sender, sendResponse) {
+    if (request.mode) {
+        mode = request.mode
+        tags = request.tags
+        time = request.time
+        change()
+        sendResponse({})
+    }
+})
+
+/* Browse to a new page */
+chrome.tabs.onUpdated.addListener(function (tabId, changeInfo, tab) {
+    block(tab)
+})
+
+mode = "pause"
+change()
+
+</script>
+</html>
+

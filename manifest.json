@@ -1,0 +1,17 @@
+{
+   "background_page": "background.html",
+   "browser_action": {
+      "default_icon": "icons/pause.png",
+      "popup":"popup.html"
+   },
+   "description": "Here's a description.",
+   "icons": {
+      "128": "icons/icon128.png",
+      "16": "icons/icon16.png",
+      "48": "icons/icon48.png"
+   },
+   "name": "Wandering Mind",
+   "options_page": "options.html",
+   "permissions": [ "notifications", "tabs", "*://*/*" ],
+   "version": "0.1"
+}

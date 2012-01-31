@@ -1,0 +1,60 @@
+<html>
+  <head>
+    <title>Wandering Mind Options</title>
+    <script src="jquery.js"></script>
+    <script src="cache.js"></script>
+    <script>
+      $(document).ready(function() {
+        $("#domain-blacklist").val(cache.getItem("blacklist").join("\n"))
+        whitelist = cache.getItem("whitelist")
+        var text = ""
+        for (var i in whitelist) {
+          text += "*" + i + "\n"
+          text += whitelist[i].join("\n")
+        }
+        $("#domain-whitelist").val(text)
+        $("#work-duration").val(cache.getItem("times")["work"])
+        $("#break-duration").val(cache.getItem("times")["break"])
+
+        $("#save").click(function(e) {
+          cache.setItem("blacklist", $("#domain-blacklist").val().split("\n"))
+          stuffs = $("#domain-whitelist").val().split("\n")
+          var whitelist = {}
+          var last = []
+          for (var i in stuffs) {
+           if (stuffs[i][0] == "*") {
+            last = stuffs[i].substr(1).split(",")
+            for (var j in last) {
+              whitelist[last[j]] = []
+            }
+           } else {
+            for (var j in last) {
+              whitelist[last[j]].push(stuffs[i])
+            }
+           } 
+          }
+          cache.setItem("whitelist", whitelist)
+          cache.setItem("times",
+           {"work": parseInt($("#work-duration").val()),
+            "break": parseInt($("#break-duration").val())})
+        })
+      })
+    </script>
+  </head>
+  <body>
+    <h1>Wandering Mind Options</h1>
+    Ban list:<br>
+        <textarea rows="15" cols="30" id="domain-blacklist"></textarea><br><br>
+        White list:<br>
+        <textarea rows="15" cols="30" id="domain-whitelist"></textarea><br><br>
+        <label for="work-duration">Work:</label>
+        <input id="work-duration" type="text" size="2" />
+        <span>minutes</span>
+        &nbsp;&nbsp;
+        <label for="break-duration">Break:</label>
+        <input id="break-duration" type="text" size="2" />
+        <span>minutes</span><br><br>
+      <button id="save">Save</button>
+  </body>
+</html>
+

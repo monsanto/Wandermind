@@ -1,0 +1,8 @@
+
+body, table, html {
+    font: 12px verdana;
+}
+
+#popup td {
+    white-space:nowrap;
+}

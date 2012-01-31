@@ -1,0 +1,17 @@
+<html>
+  <head>
+    <script src="jquery.js"></script>
+    <script>
+      $(document).ready(function() {
+        $("#pause").click(function(e) {
+          chrome.extension.sendRequest({mode: "pause"}, function(response) { })
+          window.location="yousocrazy.html"
+        })
+      })
+    </script>
+  </head>
+  <body>
+    <nobr>Really cancel? You crazy. :(</nobr>
+    <button id="pause">Cancel</button>
+  </body>
+</html>

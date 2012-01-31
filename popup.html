@@ -1,0 +1,80 @@
+<html>
+  <head>
+    <link rel="stylesheet" href="media.css" />
+    <style>
+      body {
+       width:200px;
+       height:225px;
+      }
+      #custom-time-extras {
+      display:none;
+      }
+    </style>
+    <script src="jquery.js"></script>
+    <script src="cache.js"></script>
+    <script>
+      $(document).ready(function() {
+        $("#selWork").click(function(e) {
+         $("#work-extras").show()
+      })
+      $("#selBreak").click(function(e) {
+         $("#work-extras").hide()
+      })
+      $("#selBreak").click(function(e) {
+         $("#work-extras").hide()
+      })
+
+      $("#customTime").click(function(e){
+        $("#custom-time-extras").toggle()
+      })
+      
+        $("#go").click(function(e) {
+          var mode = $("[name=mode]:checked").val()
+          var tags = $("#tags").val().split(" ")
+
+          var time
+
+          if ($("#customTime:checked").val() == "1") {
+            time = parseInt($("#time").val())
+          } else {
+            time = cache.getItem("times")[mode]
+          }
+
+          chrome.extension.sendRequest({mode: mode, tags: tags, time: time}, function(response) { })
+
+          window.location="letsdothis.html" ;
+        })
+      })
+    </script>
+  </head>
+  <body>
+    <table id="popup">
+      <tr>
+        <td><img src="icons/work.png" /></td><td><input type="radio" id="selWork" name="mode" value="work" checked /> <label for="selWork">Work</label></td>
+      </tr>
+      <tr id="work-extras">
+        <td></td>
+        <td>Which projects?<br><input type="text" id="tags" /></td>
+      <tr>
+        <td><img src="icons/break.png" /></td><td><input type="radio" id="selBreak" name="mode" value="break" /> <label for="selBreak">Break</label></td>
+      </tr>
+      <tr>
+        <td></td>
+        <td><br><input type="checkbox" id="customTime" value="1" /> <label for="customTime">Custom time?</label></td>
+      </tr>
+      <tr id="custom-time-extras">
+        <td></td>
+        <td>How long?<br> <input type="text" size="2" id="time" /> minutes</td>
+      </tr>
+      <tr>
+        <td></td>
+        <td>
+          <br>
+          <input type="submit" id="go" text="Start!">
+        </td>
+      </tr>
+
+    </table>
+    
+  </body>
+</html>
